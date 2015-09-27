@@ -1,0 +1,95 @@
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Encrypt</h3>
+        </div>
+        <div class="panel-body" id="en">
+            <div id="task"><button class="btn btn-primary">Start Encrypting</button></div>
+            <br>
+            <div class="progress">
+                <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%">
+                    <span>0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Decrypt</h3>
+        </div>
+        <div class="panel-body" id="de">
+            <div id="task"><button class="btn btn-primary">Start Decrypting</button></div>
+            <br>
+            <div class="progress">
+                <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%">
+                    <span>0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+var hasRunningTask = false;
+$('#en #task button').click(function() {
+	$.get('/t/e', function(data) {
+        hasRunningTask = true;
+    	$('#en #task').html('<b>Task ID:</b> ' + data.taskId + ' - <b>File Size: </b>' + data.fileSize + ' bytes');
+    	progressUpdate(data.taskId, 500, function(progress) {
+    		$('#en .progress-bar').css({'width': progress + '%'});
+            $('#en .progress-bar span').text(progress + '%');
+    	}, function() {
+            $.get('/information/' + data.taskId, function(data) {
+                console.log(data);
+                $('#en').append('<p><b>Algorithm: </b>'+data.algorithm+'</p><p><b>Duration: </b>'+data.duration+' ms</p><a class="btn btn-default" href="/download/'+data._id+'">Download</a>');
+                hasRunningTask = false;
+            })
+        });
+	});
+});
+$('#de #task button').click(function() {
+    $.get('/t/d', function(data) {
+        hasRunningTask = true;
+        $('#de #task').html('<b>Task ID:</b> ' + data.taskId + ' - <b>File Size: </b>' + data.fileSize + ' bytes');
+        $('#de .meter').show();
+        progressUpdate(data.taskId, 500, function(progress) {
+            $('#de .progress-bar').css({'width': progress + '%'});
+            $('#de .progress-bar span').text(progress + '%');
+        }, function() {
+            $.get('/information/' + data.taskId, function(data) {
+                console.log(data);
+                $('#de').append('<p><b>Algorithm: </b>'+data.algorithm+'</p><p><b>Duration: </b>'+data.duration+' ms</p><a class="btn btn-default" href="/download/'+data._id+'">Download</a>');
+                hasRunningTask = false;
+            })
+        });
+    });
+});
+
+function progressUpdate(taskId, timeout, progressCallback, doneCallback) {
+	var itv = setInterval(function() {
+        $.get('/progress/' + taskId, function(data) {
+            if (data) {
+            	if (progressCallback) {
+            		progressCallback(data.progress);
+            	} else  {
+            		console.log(data.progress);
+            	}
+                if (data.progress === 100) {
+                	clearInterval(itv);
+                	if (doneCallback) {
+                		doneCallback();
+                	} else {
+                		console.log('done');
+                	}
+                }
+            }
+        })
+    }, timeout);
+}
+
+$(window).on('beforeunload', function(e) {
+    if(hasRunningTask) {
+        return 'You have running task. Are you sure to leave?';
+    }
+});
+</script>

@@ -1,0 +1,66 @@
+<!-- Page Header -->
+<header class="intro-header" style="background-color:#379A82">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="page-heading">
+                    <h1>Encrypt File</h1>
+                    <hr class="small">
+                    <span class="subheading">Choose what you want...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Main Content -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <form id="encryptForm">
+                <div class="form-group">
+                    <label for="file-input">File input</label>
+                    <input type="file" id="file-input" name="file" required>
+                </div>
+                <div class="form-group">
+                    <label for="input-algorithm">Algorithm</label>
+                    <select class="form-control" id="input-algorithm">
+                        <option value="aes-256-cbc">AES-256 (CBC)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="input-key">Key</label>
+                    <input type="text" class="form-control" id="input-key" placeholder="Key" required>
+                </div>
+                <div class="form-group">
+                    <label for="input-iv">Initialization Vector</label>
+                    <input type="text" class="form-control" id="input-iv" placeholder="Initialization Vector" required>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox"> Compress before Encrypting
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fa fa-paper-plane-o"></i>&nbsp;Submit
+                </button>
+            </form>
+            <div id="progress" style="display:none">
+                <span>Uploading file...</span>
+                <div class="progress" id="upload-progress">
+                    <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%">
+                        <span>0%</span>
+                    </div>
+                </div>
+                <span>Encrypting file...</span>
+                <div class="progress" id="encrypt-progress">
+                    <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%">
+                        <span>0%</span>
+                    </div>
+                </div>
+            </div>
+            <div id="result">
+
+            </div>
+        </div>
+    </div>
+</div>
