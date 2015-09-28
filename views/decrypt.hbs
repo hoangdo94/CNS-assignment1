@@ -20,48 +20,86 @@
             <form id="decryptForm">
                 <div class="form-group">
                     <label for="file-input">File input</label>
-                    <input type="file" id="file-input" name="file" required>
+                    <input type="file" id="file-input" name="file">
                 </div>
                 <div class="form-group">
                     <label for="input-algorithm">Algorithm</label>
                     <select class="form-control" id="input-algorithm">
+                        <option value="des">DES (CBC)</option>
                         <option value="aes-256-cbc">AES-256 (CBC)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="input-key">Key</label>
-                    <input type="text" class="form-control" id="input-key" placeholder="Key" required>
+                    <input type="text" class="form-control" id="input-key" placeholder="Key">
                 </div>
                 <div class="form-group">
                     <label for="input-iv">Initialization Vector</label>
-                    <input type="text" class="form-control" id="input-iv" placeholder="Initialization Vector" required>
+                    <input type="text" class="form-control" id="input-iv" placeholder="Initialization Vector">
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox"> Compressed?
+                        <input id="input-compress" type="checkbox"> Compressed?
                     </label>
                 </div>
-                <button type="submit" class="btn btn-success">
-                    <i class="fa fa-paper-plane-o"></i>&nbsp;Submit
+                <button type="submit" class="btn btn-cb btn-success">
+                    <i class="fa fa-paper-plane-o"></i>&nbsp;Decrypt
+                </button>
+                <button type="button" class="btn btn-cb btn-info" data-toggle="modal" data-target="#importModal">
+                    <i class="glyphicon glyphicon-import"></i>&nbsp;Import
                 </button>
             </form>
             <div id="progress" style="display:none">
-                <span>Uploading file...</span>
+                <span id="ufc">Uploading file...</span>
                 <div class="progress" id="upload-progress">
                     <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%">
                         <span>0%</span>
                     </div>
                 </div>
-                <span>Decrypting file...</span>
+                <span id="dfc">Decrypting file...</span>
                 <div class="progress" id="decrypt-progress">
                     <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%">
                         <span>0%</span>
                     </div>
                 </div>
             </div>
-            <div id="result">
-
+            <div id="result" style="display:none">
+                <hr>
+                <a id="btn-download" class="btn btn-success" href="#">Download</a>
+                <a id="btn-checksum" class="btn btn-info" href="#" style="display:none;">Compare Md5 Checksum</a>
+                <a id="btn-reload" class="btn btn-primary" href="#">Decrypt Another File</a>
             </div>
         </div>
     </div>
 </div>
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Import Information</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="file-info">Information File:</label>
+                    <input type="file" id="file-info">
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="input-encrypted-information"> Encrypted Information?
+                    </label>
+                </div>
+                <div id="publickey-container" class="form-group" style="display:none;">
+                    <label for="file-publickey">Encryptor's Public key:</label>
+                    <input type="file" id="file-publickey">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="btn-import-info" class="btn btn-primary" data-dismiss="modal">Import</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/utils.js"></script>
+<script type="text/javascript" src="js/decrypt.js"></script>

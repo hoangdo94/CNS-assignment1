@@ -19,48 +19,103 @@
             <form id="encryptForm">
                 <div class="form-group">
                     <label for="file-input">File input</label>
-                    <input type="file" id="file-input" name="file" required>
+                    <input type="file" id="file-input" name="file">
                 </div>
                 <div class="form-group">
                     <label for="input-algorithm">Algorithm</label>
                     <select class="form-control" id="input-algorithm">
+                        <option value="des">DES (CBC)</option>
                         <option value="aes-256-cbc">AES-256 (CBC)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="input-key">Key</label>
-                    <input type="text" class="form-control" id="input-key" placeholder="Key" required>
+                    <button id="randomize-key" class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-random"></span>&nbsp;Randomize</button>
+                    <input type="text" class="form-control" id="input-key" placeholder="Key">
                 </div>
                 <div class="form-group">
                     <label for="input-iv">Initialization Vector</label>
-                    <input type="text" class="form-control" id="input-iv" placeholder="Initialization Vector" required>
+                    <button id="randomize-iv" class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-random"></span>&nbsp;Randomize</button>
+                    <input type="text" class="form-control" id="input-iv" placeholder="Initialization Vector">
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox"> Compress before Encrypting
+                        <input type="checkbox" id="input-compress"> Compress before Encrypting
                     </label>
                 </div>
-                <button type="submit" class="btn btn-success">
-                    <i class="fa fa-paper-plane-o"></i>&nbsp;Submit
+                <button type="submit" class="btn btn-cb btn-success">
+                    <i class="fa fa-paper-plane-o"></i>&nbsp;Encrypt
                 </button>
             </form>
+            {{!-- Progress --}}
             <div id="progress" style="display:none">
-                <span>Uploading file...</span>
+                <span id="ufc">Uploading file...</span>
                 <div class="progress" id="upload-progress">
                     <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%">
                         <span>0%</span>
                     </div>
                 </div>
-                <span>Encrypting file...</span>
+                <span id="efc">Encrypting file...</span>
                 <div class="progress" id="encrypt-progress">
                     <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%">
                         <span>0%</span>
                     </div>
                 </div>
             </div>
-            <div id="result">
-
+            {{!-- Result --}}
+            <div id="result" style="display:none;">
+                <hr>
+                <a id="btn-download" class="btn btn-success" href="#">Download</a>
+                <a id="btn-reload" class="btn btn-primary" href="#">Encrypt Another File</a>
+                <br>
+                <br>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Encrypt Information</h3>
+                    </div>
+                    <div class="panel-body" id="info-body">
+                        - <b>Algorithm:</b> <span id="info-alg"></span>
+                        <br> - <b>Key:</b> <span id="info-key"></span>
+                        <br> - <b>Initialization Vector:</b> <span id="info-iv"></span>
+                        <br> - <b>Compressed:</b> <span id="info-compress"></span>
+                        <br>
+                    </div>
+                    <div class="panel-footer">
+                        <button id="btn-checksum" class="btn btn-default btn-sm">Generate Md5 Checksum</button>
+                        <button class="btn btn-default btn-sm" data-toggle="modal" data-target="#rsaModal">Encrypt Information (RSA)</button>
+                        <button id="btn-export" class="btn btn-default btn-sm">Export</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<div class="modal fade" id="rsaModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Encrypt Information</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="file-privatekey">Your Private key:</label>
+                    <input type="file" id="file-privatekey">
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="input-encrypt-information"> Use this Feature?
+                    </label>
+                    <p class="help-block">Don't have your keys? <button id="btn-generate-keypair" class="btn btn-info btn-sm">Generate</button></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="btn-encrypt-info" type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/FileSaver.min.js"></script>
+<script type="text/javascript" src="js/utils.js"></script>
+<script type="text/javascript" src="js/encrypt.js"></script>

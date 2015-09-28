@@ -14,7 +14,6 @@ router.get('/e', function(req, res, next) {
 		algorithm: 'aes-256-cbc',
 		key: 'mondaicamondaicamondaicamondaica',
 		iv: 'mondaicamondaica',
-		md5Gen: true,
 	}
 
 	crypt.encrypt(options, function(taskId, fileSize) {
@@ -33,7 +32,6 @@ router.get('/d', function(req, res, next) {
 		algorithm: 'aes-256-cbc',
 		key: 'mondaicamondaicamondaicamondaica',
 		iv: 'mondaicamondaica',
-		md5Gen: true,
 	}
 
 	crypt.decrypt(options, function(taskId, fileSize) {
