@@ -5,6 +5,7 @@ var isInfoEncrypted;
 //Events
 $(window).load(function() {
     $('#decryptForm')[0].reset();
+    $('#input-encrypted-information').prop('checked', false);
 });
 $('#btn-import-info').click(function(e) {
     e.preventDefault();
@@ -16,37 +17,39 @@ $('#input-algorithm').change(function(e) {
 $('#input-encrypted-information').change(function() {
     isInfoEncrypted = $(this).prop('checked');
     if (isInfoEncrypted) {
-        $('#publickey-container').show();
+        $('#privatekey-container').show();
     } else {
-        $('#publickey-container').hide();
+        $('#privatekey-container').hide();
     }
 });
 $('#btn-import-info').click(function() {
     var infoFile = document.getElementById('file-info').files[0];
     if (!infoFile) {
-        alert('Please select Information file!');
+        sweetAlert('Warning', 'Please select Information file!', 'warning');
         return;
     }
 
     readFile(infoFile, function(content) {
         var data = JSON.parse(content);
-        console.log(data);
+        // console.log(data);
         if (data.md5) desiredMd5 = data.md5;
         if (isInfoEncrypted) {
-            var f = document.getElementById('file-publickey').files[0];
+            var f = document.getElementById('file-privatekey').files[0];
             if (!f) {
-                alert('Please select Public key!');
+                sweetAlert('Warning', 'Please select your Private key!', 'warning');
                 return;
             }
             readFile(f, function(pkey) {
                 var ops = {
-                    publicKey: pkey,
+                    privateKey: pkey,
                     key: data.key,
                     iv: data.iv,
                 };
-                console.log(ops);
                 $.post('/decrypt-infomation', ops, function(result) {
-                    console.log(result);
+                    $('#input-algorithm').val(data.algorithm);
+                    $('#input-key').val(result.decryptedKey);
+                    $('#input-iv').val(result.decryptedIv);
+                    $('#input-compress').prop('checked', data.compress);
                 });
             });
         } else {
@@ -61,7 +64,7 @@ $('#decryptForm').submit(function(e) {
     e.preventDefault();
     var file = document.getElementById('file-input').files[0];
     if (!file) {
-        alert('Please choose file to Encrypt!');
+        sweetAlert('Warning', 'Please select a file to Decrypt!', 'warning');
         return;
     }
     var options = {
@@ -77,7 +80,7 @@ $('#decryptForm').submit(function(e) {
         $('#upload-progress .progress-bar').css('width', percent + '%').find('span').text(percent + '%');
     }, function(status, r) {
         if (status !== 'OK') {
-            alert('Something gone wrong when uploading file');
+            sweetAlert('Error', 'Something went wrong when uploading file', 'error');
             return;
         }
         options.originalname = r.originalname;
@@ -102,14 +105,21 @@ $('#btn-checksum').click(function(e) {
     e.preventDefault();
     $.get('/hash/' + taskId, function(data) {
         if (data.hash == desiredMd5) {
-            alert('Desired Md5: ' + desiredMd5 + '\nOutput Md5: ' + data.hash + '\nMatch!');
+            sweetAlert({
+                title: 'Md5 checksum',
+                text: 'Desired Md5: ' + desiredMd5 + '\nOutput Md5: ' + data.hash + '\nMatch!',
+                type: 'success'
+            });
         } else {
-            alert('Desired Md5: ' + desiredMd5 + '\nOutput Md5: ' + data.hash + '\nMissMatch!');
+            sweetAlert({
+                title: 'Md5 checksum',
+                text: 'Desired Md5: ' + desiredMd5 + '\nOutput Md5: ' + data.hash + '\nMiss Match!',
+                type: 'error'
+            });
         }
     });
 })
 $('#btn-reload').click(function(e) {
     e.preventDefault();
-    $("form")[0].reset();
     window.location.reload();
 });

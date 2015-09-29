@@ -26,7 +26,7 @@ function uploadFile(file, progressCallback, doneCallback) {
     };
 
     xhr.onerror = function(e) {
-        alert('An error occurred while uploading file, maybe the file is too big');
+        sweetAlert('Error', 'An error occurred while uploading file, maybe the file is too big', 'error');
         location.reload();
     };
 
@@ -42,14 +42,29 @@ function uploadFile(file, progressCallback, doneCallback) {
     xhr.send(formData);
 };
 
-function progressUpdate(taskId, timeout, progressCallback, doneCallback) {
+function progressUpdate(taskId, timeout, progressCallback, doneCallback, errorCallback) {
     var itv = setInterval(function() {
         $.get('/progress/' + taskId, function(data) {
             if (data) {
-                if (progressCallback) {
-                    progressCallback(data.progress);
+                if (data.progress === 'error') {
+                    clearInterval(itv);
+                    if (errorCallback) {
+                        errorCallback();
+                    } else {
+                        sweetAlert({
+                            title: 'Error',
+                            text: 'Cannot Encrypt/Decrypt this file. Please try again...',
+                            type: 'error',
+                        }, function() {
+                            window.location.reload();
+                        });
+                    }
                 } else {
-                    console.log(data.progress);
+                    if (progressCallback) {
+                        progressCallback(data.progress);
+                    } else {
+                        console.log(data.progress);
+                    }
                 }
                 if (data.progress === 100) {
                     clearInterval(itv);
@@ -78,11 +93,11 @@ function keyValidate(options) {
     var algo = options.algorithm;
     if (!algo) return false;
     if (!options.key || options.key.length !== lengthStrict[algo].key) {
-        alert('Invalid key length');
+        sweetAlert('Warning', 'Invalid key length', 'warning');
         return false;
     }
     if (!options.iv || options.iv.length !== lengthStrict[algo].iv) {
-        alert('Invalid iv length');
+        sweetAlert('Warning', 'Invalid iv length', 'warning');
         return false;
     }
     return true;
@@ -97,7 +112,12 @@ function readFile(f, callback) {
         }
         r.readAsText(f);
     } else {
-        alert('The File APIs are not fully supported by your browser.');
-        callback(null);
+        sweetAlert({
+            title: 'Error',
+            text: 'The File APIs are not fully supported by your browser.',
+            type: 'error'
+        }, function() {
+            callback(null);
+        });
     }
 };

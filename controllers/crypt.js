@@ -21,11 +21,23 @@ function encrypt(options, callback) {
 
         if (options.compress && options.compress=='true') {
             var zip = zlib.createGzip();
+            zip.on('error', function(err) {
+                db.tmp.update({_id: id}, {$set: {status: 'error'}});
+                setTimeout(function() {
+                    db.tmp.remove({_id: id})
+                }, 30000);
+            });
             r.pipe(zip).pipe(cipher).pipe(w);
         } else {
             r.pipe(cipher).pipe(w);
         }
 
+        cipher.on('error', function(err) {
+            db.tmp.update({_id: id}, {$set: {status: 'error'}});
+            setTimeout(function() {
+                db.tmp.remove({_id: id})
+            }, 30000);
+        });
         r.on('data', function(chunk) {
             readSize += chunk.length;
             var progress = Math.round(readSize * 10000 / fileSize)/100;
@@ -70,11 +82,22 @@ function decrypt(options, callback) {
 
         if (options.compress && options.compress=='true') {
             var unzip = zlib.createGunzip();
+            unzip.on('error', function(err) {
+                db.tmp.update({_id: id}, {$set: {status: 'error'}});
+                setTimeout(function() {
+                    db.tmp.remove({_id: id})
+                }, 30000);
+            });
             r.pipe(decipher).pipe(unzip).pipe(w);
         } else {
             r.pipe(decipher).pipe(w);
         }
-
+        decipher.on('error', function(err) {
+            db.tmp.update({_id: id}, {$set: {status: 'error'}});
+            setTimeout(function() {
+                db.tmp.remove({_id: id})
+            }, 30000);
+        });
         r.on('data', function(chunk) {
             readSize += chunk.length;
             var progress = Math.round(readSize * 10000 / fileSize)/100;
@@ -117,8 +140,8 @@ function generateHash(path, alg, callback) {
     });
 };
 
-function generateKeypair(callback) {
-    var key = new NodeRSA({b: 512});
+function generateKeypair(size, callback) {
+    var key = new NodeRSA({b: size});
     var public = key.exportKey('pkcs1-public');
     var private = key.exportKey('pkcs1');
     callback({
@@ -127,23 +150,21 @@ function generateKeypair(callback) {
     });
 };
 
-function privateEncrypt(options, callback) {
+function rsaEncrypt(options, callback) {
     var key = new NodeRSA();
-    key.importKey(options.privateKey, 'pkcs1');
+    key.importKey(options.publicKey, 'pkcs1-public');
     callback({
-        encryptedKey: key.encryptPrivate(options.key).toString(),
-        encryptedIv: key.encryptPrivate(options.iv).toString(),
+        encryptedKey: key.encrypt(options.key,'base64'),
+        encryptedIv: key.encrypt(options.iv,'base64'),
     });
 };
 
-function publicDecrypt(options, callback) {
+function rsaDecrypt(options, callback) {
     var key = new NodeRSA();
-    console.log(options.publicKey);
-    key.importKey(options.publicKey, 'pkcs1');
-    console.log(key);
+    key.importKey(options.privateKey, 'pkcs1-private');
     callback({
-        decryptedKey: key.decryptPublic(options.key).toString(),
-        decryptedIv: key.decryptPublic(options.iv).toString(),
+        decryptedKey: key.decrypt(options.key,'utf8'),
+        decryptedIv: key.decrypt(options.iv,'utf8'),
     });
 };
 
@@ -152,6 +173,6 @@ module.exports = {
     decrypt: decrypt,
     generateHash: generateHash,
     generateKeypair: generateKeypair,
-    privateEncrypt: privateEncrypt,
-    publicDecrypt: publicDecrypt,
+    rsaEncrypt: rsaEncrypt,
+    rsaDecrypt: rsaDecrypt,
 }

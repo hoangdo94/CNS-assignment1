@@ -21,8 +21,8 @@ router.get('/decrypt', function(req, res, next) {
     res.render('decrypt');
 });
 
-router.get('/analytic', function(req, res, next) {
-    res.render('analytic');
+router.get('/tools', function(req, res, next) {
+    res.render('tools');
 });
 
 router.post('/upload', upload.single('inputFile'), function(req, res, next) {
@@ -44,7 +44,7 @@ router.post('/encrypt', function(req, res, next) {
         iv: req.body.iv,
         compress: req.body.compress,
     };
-    console.log(options);
+    // console.log(options);
     mkdirp(outputDir, function(err) {
         if (err) return res.send(null);
         crypt.encrypt(options, function(taskId, fileSize) {
@@ -66,7 +66,7 @@ router.post('/decrypt', function(req, res, next) {
         iv: req.body.iv,
         compress: req.body.compress,
     };
-    console.log(options);
+    // console.log(options);
     mkdirp(outputDir, function(err) {
         if (err) return res.send(null);
         crypt.decrypt(options, function(taskId, fileSize) {
@@ -83,6 +83,11 @@ router.get('/progress/:id', function(req, res, next) {
         _id: req.params.id
     }, function(err, doc) {
         if (doc) {
+            if (doc.status && doc.status == 'error') {
+                return res.json({
+                    progress: 'error'
+                });
+            }
             return res.json({
                 progress: doc.progress
             });
@@ -144,20 +149,20 @@ router.get('/download/:id', function(req, res, next) {
 });
 
 router.get('/generate-keypair', function(req, res, next) {
-    crypt.generateKeypair(function(keys) {
+    var size = parseInt(req.query.size) || 512;
+    console.log('key size', size);
+    crypt.generateKeypair(size, function(keys) {
         res.json(keys);
     });
 });
 
 router.post('/encrypt-infomation', function(req, res, next) {
-    console.log(req.body);
-    crypt.privateEncrypt(req.body, function(encrypted) {
+    crypt.rsaEncrypt(req.body, function(encrypted) {
         res.json(encrypted);
     });
 });
 router.post('/decrypt-infomation', function(req, res, next) {
-    console.log(req.body);
-    crypt.publicDecrypt(req.body, function(decrypted) {
+    crypt.rsaDecrypt(req.body, function(decrypted) {
         res.json(decrypted);
     });
 });

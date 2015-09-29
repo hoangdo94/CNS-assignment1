@@ -25,7 +25,7 @@ $('#encryptForm').submit(function(e) {
     $('#btn-checksum').prop('disabled', false);
     var file = document.getElementById('file-input').files[0];
     if (!file) {
-        alert('Please choose file to Encrypt!');
+        sweetAlert('Warning','Please select a file to Encrypt!','warning');
         return;
     }
     options = {
@@ -41,7 +41,7 @@ $('#encryptForm').submit(function(e) {
         $('#upload-progress .progress-bar').css('width', percent + '%').find('span').text(percent + '%');
     }, function(status, r) {
         if (status !== 'OK') {
-            alert('Something gone wrong when uploading file');
+            sweetAlert('Error','Something went wrong when uploading file','error');
             return;
         }
         options.originalname = r.originalname;
@@ -89,33 +89,18 @@ $('#btn-export').click(function(e) {
     });
     saveAs(blob, taskId + '.info');
 });
-$('#btn-generate-keypair').click(function(e) {
-    e.preventDefault();
-    $.get('/generate-keypair', function(data) {
-        var privateBlob = new Blob([data.privateKey], {
-            type: "application/x-x509-ca-cert"
-        });
-        var publicBlob = new Blob([data.publicKey], {
-            type: "application/x-x509-ca-cert"
-        });
-        setTimeout(function() {
-            saveAs(publicBlob, 'public.pem');
-        }, 500)
-        saveAs(privateBlob, 'private.pem');
-    })
-});
 $('#btn-encrypt-info').click(function(e) {
     e.preventDefault();
     isInfoEncrypted = $('#input-encrypt-information').prop('checked');
     if (isInfoEncrypted) {
-        var f = document.getElementById('file-privatekey').files[0];
+        var f = document.getElementById('file-publickey').files[0];
         if (!f) {
-            alert('Please select your Private key!');
+            sweetAlert('Warning', 'Please select receiver\'s Public key!', 'warning');
             return;
         }
         readFile(f, function(pkey) {
             var data = {
-                privateKey: pkey,
+                publicKey: pkey,
                 key: options.key,
                 iv: options.iv,
             };
@@ -133,6 +118,5 @@ $('#btn-encrypt-info').click(function(e) {
 });
 $('#btn-reload').click(function(e) {
     e.preventDefault();
-    $("form")[0].reset();
     window.location.reload();
 });
