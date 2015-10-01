@@ -12,14 +12,12 @@
         </div>
     </div>
 </header>
-
 <div class="container">
     <div class="row">
         <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Generate RSA Keypair</h3>
-                    Don't have your keypair? You can generate them here :)
+                    <h3 class="panel-title">Generate RSA Keypair</h3> Don't have your keypair? You can generate them here :)
                 </div>
                 <div class="panel-body">
                     <div class="form-group">
@@ -47,11 +45,9 @@
                     </div>
                 </div>
             </div>
-
-             <div class="panel panel-default">
+            <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Task Information</h3>
-                    You have a taskId and want to know its information?
+                    <h3 class="panel-title">Task Information</h3> You have a taskId and want to know its information?
                 </div>
                 <div class="panel-body">
                     <div class="form-group">
@@ -63,8 +59,49 @@
                     </div>
                 </div>
             </div>
-
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Analytic</h3> )(*#)$+!#$#+!$#()
+                </div>
+                <div class="panel-body">
+                    <form class="form-inline" id="query-form">
+                        <div class="form-group">
+                            <label for="query-algorithm">Algorithm</label>
+                            <select type="text" class="form-control" id="query-algorithm" name="algorithm">
+                                <option value="des">DES (CBC)</option>
+                                <option value="aes-256-cbc">AES-256 (CBC)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="query-task">Task</label>
+                            <select type="text" class="form-control" id="query-task" name="task">
+                                <option value="encrypt">Encrypt</option>
+                                <option value="decrypt">Decrypt</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="query-compress">Compress</label>
+                            <select type="text" class="form-control" id="query-compress" name="compress">
+                                <option value="false">False</option>
+                                <option value="true">True</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Analize
+                        </button>
+                    </form>
+                    <div class="checkbox">
+                        <label>
+                            <input id="query-compare" type="checkbox"> Compare 2 Algorithm?
+                        </label>
+                    </div>
+                    <hr>
+                    <canvas id="ana-chart" style="width:100% !important;"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+<script type="text/javascript" src="js/lib/Chart.min.js"></script>
+<script type="text/javascript" src="js/lib/Chart.Scatter.min.js"></script>
 <script type="text/javascript" src="js/tools.js"></script>

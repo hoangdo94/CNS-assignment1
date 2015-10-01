@@ -148,6 +148,25 @@ router.get('/download/:id', function(req, res, next) {
     })
 });
 
+router.get('/analytic', function(req, res, next) {
+    var selector = {
+        algorithm: req.query.algorithm || 'des',
+        task: req.query.task || 'encrypt',
+        compress: req.query.compress || 'true',
+    }
+    db.per.find(selector).sort({
+        size: 1
+    }).exec(function(err, docs) {
+        console.log(docs);
+        res.json(docs.map(function(doc) {
+            return {
+                x: doc.size,
+                y: doc.duration,
+            }
+        }));
+    })
+});
+
 router.get('/generate-keypair', function(req, res, next) {
     var size = parseInt(req.query.size) || 512;
     console.log('key size', size);
