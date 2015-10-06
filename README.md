@@ -1,4 +1,5 @@
-# Cryptos: Cryptography & Network Security assignment 1
+# Cryptos
+### HCMUT Cryptography & Network Security Assignment 1 ###
 ### To Install ###
 npm install
 ### To Start ###
